@@ -31,5 +31,23 @@ namespace Louw.SitemapParser.UnitTests
 
             Assert.Equal("http://example.com/map.xml", sitemaps[c++].AbsoluteUri); //Relative path resolves to base only
         }
+
+        [Fact]
+        public void TestParseWithoutBaseUri()
+        {
+            var robotsData = File.ReadAllText(@"testdata\Robots.txt");
+            Assert.False(string.IsNullOrEmpty(robotsData));
+            IRobotsTxtParser parser = new RobotsTxtParser();
+
+            //If baseUri not specified, we cannot handle relative paths
+            //Technically the spec does not allow for relative paths
+            var sitemaps = parser.Parse(robotsData, null).ToList();
+
+            int c = 0;
+            Assert.Equal(3, sitemaps.Count);
+            Assert.Equal("http://example.com/testmap.xml", sitemaps[c++].AbsoluteUri);
+            Assert.Equal("http://anothersite.com/CaseSenSitive.Xml", sitemaps[c++].AbsoluteUri);
+            Assert.Equal("http://blog.example.com/another-subdomain.xml", sitemaps[c++].AbsoluteUri);
+        }
     }
 }

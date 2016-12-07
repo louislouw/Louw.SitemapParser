@@ -8,6 +8,7 @@ namespace Louw.SitemapParser.UnitTests
 {
     public class SitemapParserTests
     {
+        #region SitemapParser.ParseSitemapItemFields
         [Fact]
         public void TestParseItemCreate1()
         {
@@ -129,5 +130,85 @@ namespace Louw.SitemapParser.UnitTests
             var item2 = SitemapParser.ParseSitemapItemFields(null, "/path/blog");
             Assert.Null(item2);
         }
+        #endregion
+
+        #region SitemapParser.ParseSitemapFields
+        [Fact]
+        public void TestParseSitemapCreate1()
+        {
+            string location = "http://example.com/sitemap.xml";
+            var sitemap = SitemapParser.ParseSitemapFields(null, location, null);
+            Assert.NotNull(sitemap);
+            Assert.Equal(location, sitemap.SitemapLocation.AbsoluteUri);
+            Assert.False(sitemap.LastModified.HasValue);
+            Assert.Equal(SitemapType.NotLoaded, sitemap.SitemapType);
+            Assert.Empty(sitemap.Sitemaps);
+            Assert.Empty(sitemap.Items);
+            Assert.False(sitemap.IsLoaded);
+        }
+
+        [Fact]
+        public void TestParseSitemapCreate2()
+        {
+            string location = "http://example.com/sitemap.xml";
+            var sitemap = SitemapParser.ParseSitemapFields(null, location, "2016-09-11");
+            Assert.NotNull(sitemap);
+            Assert.Equal(location, sitemap.SitemapLocation.AbsoluteUri);
+            Assert.True(sitemap.LastModified.HasValue);
+            Assert.Equal(new DateTime(2016, 9, 11), sitemap.LastModified.Value);
+            Assert.Equal(SitemapType.NotLoaded, sitemap.SitemapType);
+            Assert.Empty(sitemap.Sitemaps);
+            Assert.Empty(sitemap.Items);
+            Assert.False(sitemap.IsLoaded);
+        }
+
+        [Fact]
+        public void TestParseSitemapCreateDateFormats()
+        {
+            string location = "http://example.com/sitemap.xml";
+            var sitemap1 = SitemapParser.ParseSitemapFields(null, location, "2004-10-01T18:23:17+00:00");
+            Assert.Equal(DateTimeKind.Utc, sitemap1.LastModified.Value.Kind);
+            Assert.Equal(new DateTime(2004, 10, 1,18,23,17, DateTimeKind.Utc), sitemap1.LastModified.Value);
+
+            var sitemap2 = SitemapParser.ParseSitemapFields(null, location, "2004-10-01T18:23:17+02:00");
+            Assert.Equal(DateTimeKind.Utc, sitemap2.LastModified.Value.Kind);
+            Assert.Equal(new DateTime(2004, 10, 1, 16, 23, 17, DateTimeKind.Utc), sitemap2.LastModified.Value);
+        }
+
+        [Fact]
+        public void TestParseSitemapCreateOutOfSpecDateFormats()
+        {
+            string location = "http://example.com/sitemap.xml";
+            var sitemap1 = SitemapParser.ParseSitemapFields(null, location, "2004-10-01 18:23:17");
+            Assert.Equal(DateTimeKind.Utc, sitemap1.LastModified.Value.Kind);
+            Assert.Equal(new DateTime(2004, 10, 1, 18, 23, 17, DateTimeKind.Utc), sitemap1.LastModified.Value);
+
+            var sitemap2 = SitemapParser.ParseSitemapFields(null, location, "7 May, 2016 18:23");
+            Assert.Equal(DateTimeKind.Utc, sitemap2.LastModified.Value.Kind);
+            Assert.Equal(new DateTime(2016, 5, 7, 18, 23, 00, DateTimeKind.Utc), sitemap2.LastModified.Value);
+        }
+
+        [Fact]
+        public void TestParseSitemapCreateRelativePaths()
+        {
+            Uri baseUri = new Uri("http://example.com/subdir/sitemap.xml");
+            var sitemap1 = SitemapParser.ParseSitemapFields(baseUri, "/map1.xml", null);
+            Assert.Equal("http://example.com/map1.xml", sitemap1.SitemapLocation.AbsoluteUri);
+
+            var sitemap2 = SitemapParser.ParseSitemapFields(baseUri, "path/map2.xml", null);
+            Assert.Equal("http://example.com/subdir/path/map2.xml", sitemap2.SitemapLocation.AbsoluteUri);
+        }
+
+        [Fact]
+        public void TestParseSitemapBadLocation()
+        {
+            var sitemap1 = SitemapParser.ParseSitemapFields(null, "http://bad url/map1.xml", null);
+            Assert.Null(sitemap1);
+
+            //Only support relative paths if baseUri supplied
+            var sitemap2 = SitemapParser.ParseSitemapFields(null, "map2.xml", null);
+            Assert.Null(sitemap2);
+        }
+        #endregion
     }
 }

@@ -57,11 +57,16 @@ namespace Louw.SitemapParser
 
         public static Sitemap ParseSitemapFields(Uri baseUri, string location, string lastModified)
         {
-            Uri sitemapLocation = SafeUriParse(baseUri, location);
+            if (string.IsNullOrEmpty(location))
+                return null;
+
+            Uri parsedLocation = SafeUriParse(baseUri, location);
+            if (parsedLocation == null)
+                return null;
 
             DateTime? parsedLastModified = SafeDateTimeParse(lastModified);
 
-            return new Sitemap(sitemapLocation, parsedLastModified);
+            return new Sitemap(parsedLocation, parsedLastModified);
         }
 
         public static SitemapItem ParseSitemapItemFields(Uri baseUri, string location, string lastModified = null, string changeFrequency = null, string priority = null)

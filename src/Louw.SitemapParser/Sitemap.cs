@@ -12,6 +12,7 @@ namespace Louw.SitemapParser
         public IEnumerable<Sitemap> Sitemaps { get; }
         public IEnumerable<SitemapItem> Items { get; }
         public DateTime? LastModified { get; }
+        public bool IsLoaded { get { return this.SitemapType != SitemapType.NotLoaded; } }
 
         public Sitemap(Uri sitemapLocation, DateTime? lastModified = null)
         {
@@ -21,6 +22,8 @@ namespace Louw.SitemapParser
             SitemapLocation = sitemapLocation;
             LastModified = lastModified;
             SitemapType = SitemapType.NotLoaded;
+            Sitemaps = Enumerable.Empty<Sitemap>();
+            Items = Enumerable.Empty<SitemapItem>();
         }
 
         public Sitemap(IEnumerable<Sitemap> sitemaps, Uri sitemapLocation = null, DateTime? lastModified = null)
@@ -31,8 +34,9 @@ namespace Louw.SitemapParser
             Sitemaps = sitemaps.ToList();
             SitemapLocation = sitemapLocation;
             LastModified = lastModified;
+            Items = Enumerable.Empty<SitemapItem>();
 
-            if (sitemapLocation != null && sitemapLocation.LocalPath.StartsWith("robots.txt", StringComparison.OrdinalIgnoreCase))
+            if ((sitemapLocation != null) && sitemapLocation.LocalPath.StartsWith("robots.txt", StringComparison.OrdinalIgnoreCase))
                 SitemapType = SitemapType.Robots;
             else
                 SitemapType = SitemapType.Index;
@@ -47,6 +51,7 @@ namespace Louw.SitemapParser
             SitemapLocation = sitemapLocation;
             LastModified = Items.Where(x => x.LastModified.HasValue).Max(x => x.LastModified.Value);
             SitemapType = SitemapType.Items;
+            Sitemaps = Enumerable.Empty<Sitemap>();
         }
 
         public async Task<Sitemap> LoadAsync()
