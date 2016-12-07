@@ -246,6 +246,18 @@ namespace Louw.SitemapParser.UnitTests
             Assert.Equal(SitemapType.NotLoaded, sitemaps[1].SitemapType);
             Assert.Empty(sitemaps[1].Items);
             Assert.Empty(sitemaps[1].Sitemaps);
+
+            var postSitemap = await sitemaps[0].LoadAsync(fetcher);
+            Assert.NotNull(postSitemap);
+            Assert.True(postSitemap.IsLoaded);
+            Assert.Equal(SitemapType.Items, postSitemap.SitemapType);
+            Assert.Equal("http://example/post-sitemap.xml", postSitemap.SitemapLocation.AbsoluteUri);
+            Assert.True(postSitemap.LastModified.HasValue);
+            Assert.Equal(new DateTime(2016,12,10), postSitemap.LastModified.Value);
+            Assert.Empty(postSitemap.Sitemaps);
+            Assert.NotNull(postSitemap.Items);
+            var postItems = postSitemap.Items.ToList();
+            Assert.Equal(5, postItems.Count);
         }
         #endregion
     }

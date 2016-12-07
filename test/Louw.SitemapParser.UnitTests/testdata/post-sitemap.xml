@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="//example.com/main-sitemap.xsl"?>
+<urlset
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://example.com</loc>
+    <lastmod>2016-11-30T22:19:52+02:00</lastmod>
+  </url>
+  <url>
+    <loc>http://example.com/article-nodate/</loc>
+  </url>
+  <url>
+    <loc>http://example.com/article-daily/</loc>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>http://example.com/article-priority/</loc>
+    <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>http://example.com/article-priority/</loc>
+    <lastmod>2016-12-10</lastmod>
+  </url>
+</urlset>
