@@ -99,6 +99,7 @@ namespace Louw.SitemapParser.UnitTests
             Assert.True(item.ChangeFrequency.HasValue);
             Assert.True(item.Priority.HasValue);
 
+            Assert.Equal(DateTimeKind.Utc, item.LastModified.Value.Kind);
             Assert.Equal(new DateTime(2004, 12, 23, 18, 30, 15, DateTimeKind.Utc), item.LastModified.Value);
             Assert.Equal(SitemapChangeFrequency.Hourly, item.ChangeFrequency.Value);
             Assert.Equal(0.0, item.Priority.Value);
