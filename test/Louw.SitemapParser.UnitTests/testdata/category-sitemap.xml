@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="//example.com/main-sitemap.xsl"?>
+<urlset
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://example.com/category/actor/</loc>
+    <lastmod>2016-11-30T22:15:29+02:00</lastmod>
+  </url>
+  <url>
+    <loc>http://example.com/category/actress/</loc>
+    <lastmod>2016-11-30T22:19:52+02:00</lastmod>
+  </url>
+  <url>
+    <loc>http://example.com/category/comedian/</loc>
+    <lastmod>2016-11-24T19:55:03+02:00</lastmod>
+  </url>
+</urlset>

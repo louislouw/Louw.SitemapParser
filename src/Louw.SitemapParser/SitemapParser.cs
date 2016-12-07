@@ -9,7 +9,7 @@ namespace Louw.SitemapParser
 {
     public interface ISitemapParser
     {
-
+        Sitemap Parse(string sitemapData, Uri sitemapUri = null);
     }
 
 
@@ -17,7 +17,10 @@ namespace Louw.SitemapParser
     {
         #region Element Names
         private const string SitemapSchema = "http://www.sitemaps.org/schemas/sitemap/0.9";
+
         private readonly XName SitemapIndexName = XName.Get("sitemapindex", SitemapSchema);
+        private readonly XName SitemapName = XName.Get("sitemap", SitemapSchema);
+
         private readonly XName UrlSetName = XName.Get("urlset", SitemapSchema);
         private readonly XName UrlName = XName.Get("url", SitemapSchema);
         private readonly XName LocationName = XName.Get("loc", SitemapSchema);
@@ -36,13 +39,13 @@ namespace Louw.SitemapParser
                 XElement sitemapXElement = XElement.Parse(sitemapData);
 
                 //Check if this is Index Sitemap
-                if (sitemapXElement.Element(SitemapIndexName) != null)
+                if (sitemapXElement.Name.Equals(SitemapIndexName))
                 {
                     return ParseIndexSitemap(sitemapXElement, sitemapUri);
                 }
 
                 //Check if this is Normal Sitemap with items
-                if(sitemapXElement.Element(UrlSetName) != null)
+                if(sitemapXElement.Name.Equals(UrlSetName))
                 {
                     return ParseSitemapItems(sitemapXElement, sitemapUri);
                 }
@@ -101,7 +104,7 @@ namespace Louw.SitemapParser
         private Sitemap ParseIndexSitemap(XElement sitemapXElement, Uri sitemapLocation)
         {
             var sitemaps = new List<Sitemap>();
-            foreach (var urlElement in sitemapXElement.Elements(UrlName))
+            foreach (var urlElement in sitemapXElement.Elements(SitemapName))
             {
                 var locElement = urlElement.Element(LocationName);
                 if (locElement == null || string.IsNullOrWhiteSpace(locElement.Value))
@@ -114,7 +117,9 @@ namespace Louw.SitemapParser
                     sitemaps.Add(sitemap);
             }
 
-            return new Sitemap(sitemaps, sitemapLocation);
+            DateTime? lastModified = SafeMaxDate(sitemaps.Select(x => x.LastModified));
+
+            return new Sitemap(sitemaps, sitemapLocation, lastModified);
         }
 
         private Sitemap ParseSitemapItems(XElement sitemapXElement, Uri sitemapLocation)
@@ -133,7 +138,9 @@ namespace Louw.SitemapParser
                 sitemapItems.Add(sitemapItem);
             }
 
-            return new Sitemap(sitemapItems, sitemapLocation);
+            DateTime? lastModified = SafeMaxDate(sitemapItems.Select(x => x.LastModified));
+
+            return new Sitemap(sitemapItems, sitemapLocation, lastModified);
         }
 
         private static Uri SafeUriParse(Uri baseUri, string location)
@@ -180,6 +187,26 @@ namespace Louw.SitemapParser
             }
 
             return null;
+        }
+
+        private static DateTime? SafeMaxDate(IEnumerable<DateTime?> dates)
+        {
+            var dateList = dates
+                .Where(x => x.HasValue)
+                .Select(x => x.Value)
+                .ToList();
+
+            if (dateList.Count == 0)
+                return null;
+
+            DateTime maxDate = dateList[0];
+            for (int i = 1; i < dateList.Count; i++)
+            {
+                if (maxDate < dateList[i])
+                    maxDate = dateList[i];
+            }
+
+            return maxDate;
         }
         #endregion
     }

@@ -36,34 +36,22 @@ namespace Louw.SitemapParser
             LastModified = lastModified;
             Items = Enumerable.Empty<SitemapItem>();
 
-            if ((sitemapLocation != null) && sitemapLocation.LocalPath.StartsWith("robots.txt", StringComparison.OrdinalIgnoreCase))
+            if ((sitemapLocation != null) && sitemapLocation.LocalPath.StartsWith("/robots.txt", StringComparison.OrdinalIgnoreCase))
                 SitemapType = SitemapType.Robots;
             else
                 SitemapType = SitemapType.Index;
         }
 
-        public Sitemap(IEnumerable<SitemapItem> items, Uri sitemapLocation = null)
+        public Sitemap(IEnumerable<SitemapItem> items, Uri sitemapLocation = null, DateTime? lastModified = null)
         {
             if (items == null)
                 throw new ArgumentNullException("items");
 
             Items = items.ToList();
             SitemapLocation = sitemapLocation;
-            LastModified = Items.Where(x => x.LastModified.HasValue).Max(x => x.LastModified.Value);
+            LastModified = lastModified;
             SitemapType = SitemapType.Items;
             Sitemaps = Enumerable.Empty<Sitemap>();
-        }
-
-        public async Task<Sitemap> LoadAsync()
-        {
-            //We are already loaded!
-            if (SitemapType != SitemapType.NotLoaded)
-                return this;
-
-            if (SitemapLocation == null)
-                throw new InvalidOperationException("Sitemap location not specified");
-
-            return await Task.FromResult<Sitemap>(null);
         }
     }
 }

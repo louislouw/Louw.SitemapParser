@@ -210,5 +210,43 @@ namespace Louw.SitemapParser.UnitTests
             Assert.Null(sitemap2);
         }
         #endregion
+
+        #region Sitemap Parsing Tests
+        [Fact]
+        public async Task TestParseSitemapIndex()
+        {
+            DateTime expectedLastModifiedMax = new DateTime(2016, 11, 30, 20, 19, 52, 0, DateTimeKind.Utc);
+            DateTime expectedLastModifiedMin = new DateTime(2016, 11, 29, 20, 19, 52, 0, DateTimeKind.Utc);
+            Uri sitemapLocation = new Uri("http://example.com/sitemap_index.xml");
+            var sitemap1 = new Sitemap(sitemapLocation);
+            Assert.False(sitemap1.IsLoaded);
+
+            var fetcher = new mocks.MockSitemapFetcher();
+            var sitemap2 = await sitemap1.LoadAsync(fetcher);
+            Assert.NotNull(sitemap2);
+            Assert.True(sitemap2.IsLoaded);
+            Assert.Equal(SitemapType.Index, sitemap2.SitemapType);
+            Assert.Equal(sitemapLocation, sitemap2.SitemapLocation);
+            Assert.True(sitemap2.LastModified.HasValue);
+            Assert.Equal(expectedLastModifiedMax, sitemap2.LastModified.Value);
+            Assert.Empty(sitemap2.Items);
+            Assert.NotNull(sitemap2.Sitemaps);
+
+            var sitemaps = sitemap2.Sitemaps.ToList();
+            
+            Assert.Equal(2, sitemaps.Count);
+            Assert.Equal("http://example/post-sitemap.xml", sitemaps[0].SitemapLocation.AbsoluteUri);
+            Assert.Equal(expectedLastModifiedMax, sitemaps[0].LastModified.Value);
+            Assert.Equal(SitemapType.NotLoaded, sitemaps[0].SitemapType);
+            Assert.Empty(sitemaps[0].Items);
+            Assert.Empty(sitemaps[0].Sitemaps);
+
+            Assert.Equal("http://example.com/category-sitemap.xml", sitemaps[1].SitemapLocation.AbsoluteUri);
+            Assert.Equal(expectedLastModifiedMin, sitemaps[1].LastModified.Value);
+            Assert.Equal(SitemapType.NotLoaded, sitemaps[1].SitemapType);
+            Assert.Empty(sitemaps[1].Items);
+            Assert.Empty(sitemaps[1].Sitemaps);
+        }
+        #endregion
     }
 }
