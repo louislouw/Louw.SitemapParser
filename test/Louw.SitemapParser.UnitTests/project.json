@@ -22,7 +22,7 @@
     }
   },
 
-  //"buildOptions": {
-  //  "copyToOutput": [ "testdata/sitemap.xml" ]
-  //}
+  "buildOptions": {
+    "copyToOutput": [ "testdata/*.*" ]
+  }
 }

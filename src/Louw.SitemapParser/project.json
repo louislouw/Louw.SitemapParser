@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
 
   "dependencies": {
@@ -7,11 +7,16 @@
 
   "frameworks": {
     "netstandard1.6": {
-      "imports": "dnxcore50"
+      "imports": "dnxcore50",
+      "dependencies": {
+        "System.Xml.XDocument": "4.3.0"
+      }
     },
     "net452": {
       "dependencies": {
-        "Microsoft.NETCore.Platforms": "1.0.1"
+        "Microsoft.NETCore.Platforms": "1.0.1",
+        "System.Xml.XDocument": "4.0.0",
+        "System.Xml.Linq": "3.5.21022.801"
       }
     }
   }

@@ -1,0 +1,20 @@
+﻿User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+
+//Absolute path sitemaps
+Sitemap: http://example.com/testmap.xml
+SITEMAP: http://anothersite.com/CaseSenSitive.Xml 
+Sitemap:http://blog.example.com/another-subdomain.xml
+
+//Technically relative paths are not allowed in specification
+//However we support is as some sites use them (See http://stackoverflow.com/robots.txt)
+Sitemap: /testmap.xml
+SiteMap: /CaseSenSitive.Xml
+Sitemap:/nospace.xml
+
+//This path can not resolve to higher than root (/)
+Sitemap: ../../../../map.xml
+
+//Some invalid paths - should be filtered out
+Sitemap: http://invalid server name.com/sitemap.xml
