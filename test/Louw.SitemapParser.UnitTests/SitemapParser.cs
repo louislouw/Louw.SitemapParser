@@ -6,10 +6,10 @@ using Xunit;
 
 namespace Louw.SitemapParser.UnitTests
 {
-    public class SitemapParserT
+    public class SitemapParserTests
     {
         [Fact]
-        public void TestParseCreate1()
+        public void TestParseItemCreate1()
         {
             var testUrl = "http://example.com/";
             var item =  SitemapParser.ParseSitemapItemFields(null, testUrl);
@@ -21,7 +21,7 @@ namespace Louw.SitemapParser.UnitTests
         }
 
         [Fact]
-        public void TestParseCreate2()
+        public void TestParseItemCreate2()
         {
             var testUrl = "http://example.com/";
             var item = SitemapParser.ParseSitemapItemFields(null, testUrl, "2016-11-01", "hourly", "0.5");
@@ -37,7 +37,7 @@ namespace Louw.SitemapParser.UnitTests
         }
 
         [Fact]
-        public void TestParseCreate3()
+        public void TestParseItemCreate3()
         {
             var testUrl = "http://example.com/";
             var item = SitemapParser.ParseSitemapItemFields(null, testUrl, "2004-12-23T18:30:15+00:00", "Hourly", "0");
@@ -54,7 +54,7 @@ namespace Louw.SitemapParser.UnitTests
         }
 
         [Fact]
-        public void TestParseCreate4()
+        public void TestParseItemCreate4()
         {
             var testUrl = "http://example.com/";
             var item = SitemapParser.ParseSitemapItemFields(null, testUrl, "baddate", "badfreq", "badnum");
@@ -66,7 +66,7 @@ namespace Louw.SitemapParser.UnitTests
         }
 
         [Fact]
-        public void TestParseCreatePriorityRanges()
+        public void TestParseItemCreatePriorityRanges()
         {
             var testUrl = "http://example.com/";
             var item1 = SitemapParser.ParseSitemapItemFields(null, testUrl, null, null, "0.0");
@@ -82,7 +82,7 @@ namespace Louw.SitemapParser.UnitTests
         }
 
         [Fact]
-        public void TestParseCreateLocalDates()
+        public void TestParseItemCreateLocalDates()
         {
             var testUrl = "http://example.com/";
             var item = SitemapParser.ParseSitemapItemFields(null, testUrl, "2004-12-23T18:30:15+02:00", null, null);
@@ -91,7 +91,7 @@ namespace Louw.SitemapParser.UnitTests
         }
 
         [Fact]
-        public void TestParseCreateOutOfSpecDates()
+        public void TestParseItemCreateOutOfSpecDates()
         {
             var testUrl = "http://example.com/";
             var item1 = SitemapParser.ParseSitemapItemFields(null, testUrl, "7 May, 2016", null, null);
@@ -101,6 +101,33 @@ namespace Louw.SitemapParser.UnitTests
             var item2 = SitemapParser.ParseSitemapItemFields(null, testUrl, "7 May, 2016 16:40", null, null);
             Assert.Equal(DateTimeKind.Utc, item2.LastModified.Value.Kind);
             Assert.Equal(new DateTime(2016, 5, 7, 16, 40, 0, 0, DateTimeKind.Utc), item2.LastModified.Value);
+        }
+
+        [Fact]
+        public void TestParseItemRelativePath()
+        {
+            //Note: Relative paths only supported if baseUri is supplied
+            Uri baseUri = new Uri("http://example.com/subdir/sitemap.xml");
+
+            var item1 = SitemapParser.ParseSitemapItemFields(baseUri, "/path/blog");
+            Assert.NotNull(item1);
+            Assert.Equal("http://example.com/path/blog", item1.Location.AbsoluteUri);
+
+            var item2 = SitemapParser.ParseSitemapItemFields(baseUri, "path/abc");
+            Assert.NotNull(item2);
+            Assert.Equal("http://example.com/subdir/path/abc", item2.Location.AbsoluteUri);
+        }
+
+        [Fact]
+        public void TestParseItemInvalidLocation()
+        {
+            //Not valid Uri
+            var item1 = SitemapParser.ParseSitemapItemFields(null, "http://bad url.com/");
+            Assert.Null(item1);
+
+            //Relative paths only supported if baseUri is supplied
+            var item2 = SitemapParser.ParseSitemapItemFields(null, "/path/blog");
+            Assert.Null(item2);
         }
     }
 }
