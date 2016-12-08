@@ -1,6 +1,5 @@
 {
   "version": "0.0.1-*",
-
   "frameworks": {
     "netstandard1.6": {
       "dependencies": {
@@ -17,7 +16,6 @@
       }
     }
   },
-
   "packOptions": {
     "owners": [ "louislouw" ],
     "summary": "Library to parse Sitemaps as specified at https://www.sitemaps.org",

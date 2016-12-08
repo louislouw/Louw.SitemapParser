@@ -9502,7 +9502,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Louw.SitemapParser >= 1.0.0-*",
+      "Louw.SitemapParser >= 0.0.1-*",
       "dotnet-test-xunit >= 2.2.0-preview2-build1029",
       "xunit >= 2.2.0-beta2-build3300"
     ],

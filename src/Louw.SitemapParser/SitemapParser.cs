@@ -11,6 +11,7 @@ namespace Louw.SitemapParser
     {
         #region Element Names
         private const string SitemapSchema = "http://www.sitemaps.org/schemas/sitemap/0.9";
+        //Note: Namespace not consistently being used. So we actually ignore namespaces
 
         private readonly XName SitemapIndexName = XName.Get("sitemapindex", SitemapSchema);
         private readonly XName SitemapName = XName.Get("sitemap", SitemapSchema);
@@ -33,13 +34,13 @@ namespace Louw.SitemapParser
                 XElement sitemapXElement = XElement.Parse(sitemapContent);
 
                 //Check if this is Index Sitemap
-                if (sitemapXElement.Name.Equals(SitemapIndexName))
+                if (sitemapXElement.Name.EqualsAnyNS(SitemapIndexName))
                 {
                     return ParseIndexSitemap(sitemapXElement, sitemapLocation);
                 }
 
                 //Check if this is Normal Sitemap with items
-                if(sitemapXElement.Name.Equals(UrlSetName))
+                if(sitemapXElement.Name.EqualsAnyNS(UrlSetName))
                 {
                     return ParseSitemapItems(sitemapXElement, sitemapLocation);
                 }
@@ -100,13 +101,13 @@ namespace Louw.SitemapParser
         private Sitemap ParseIndexSitemap(XElement sitemapXElement, Uri sitemapLocation)
         {
             var sitemaps = new List<Sitemap>();
-            foreach (var urlElement in sitemapXElement.Elements(SitemapName))
+            foreach (var urlElement in sitemapXElement.ElementsAnyNS(SitemapName))
             {
-                var locElement = urlElement.Element(LocationName);
+                var locElement = urlElement.ElementAnyNS(LocationName);
                 if (locElement == null || string.IsNullOrWhiteSpace(locElement.Value))
                     continue;
 
-                var lastmodElement = urlElement.Element(LastModifiedName);
+                var lastmodElement = urlElement.ElementAnyNS(LastModifiedName);
 
                 Sitemap sitemap = ParseSitemapFields(sitemapLocation, locElement?.Value, lastmodElement?.Value);
                 if(sitemap!=null)
@@ -121,15 +122,15 @@ namespace Louw.SitemapParser
         private Sitemap ParseSitemapItems(XElement sitemapXElement, Uri sitemapLocation)
         {
             var sitemapItems = new List<SitemapItem>();
-            foreach (var urlElement in sitemapXElement.Elements(UrlName))
+            foreach (var urlElement in sitemapXElement.ElementsAnyNS(UrlName))
             {
-                var locElement = urlElement.Element(LocationName);
+                var locElement = urlElement.ElementAnyNS(LocationName);
                 if (locElement == null || string.IsNullOrWhiteSpace(locElement.Value))
                     continue;
 
-                var lastmodElement = urlElement.Element(LastModifiedName);
-                var changefreqElement = urlElement.Element(ChangeFrequencyName);
-                var priorityElement = urlElement.Element(PriorityName);
+                var lastmodElement = urlElement.ElementAnyNS(LastModifiedName);
+                var changefreqElement = urlElement.ElementAnyNS(ChangeFrequencyName);
+                var priorityElement = urlElement.ElementAnyNS(PriorityName);
                 var sitemapItem = ParseSitemapItemFields(sitemapLocation, locElement?.Value, lastmodElement?.Value, changefreqElement?.Value, priorityElement?.Value);
                 sitemapItems.Add(sitemapItem);
             }
@@ -205,5 +206,46 @@ namespace Louw.SitemapParser
             return maxDate;
         }
         #endregion
+    }
+
+    //Helps us ignore namespaces
+    //See http://stackoverflow.com/questions/1145659/ignore-namespaces-in-linq-to-xml
+    public static class XContainerExtensions
+    {
+        public static IEnumerable<XElement> ElementsAnyNS<T>(this T source, string localName) where T : XContainer
+        {
+            return source.Elements().Where(e => e.Name.LocalName == localName);
+        }
+
+        public static IEnumerable<XElement> ElementsAnyNS<T>(this T source, XName xName) where T : XContainer
+        {
+            return source.ElementsAnyNS<T>(xName.LocalName);
+        }
+
+        public static XElement ElementAnyNS<T>(this T source, string localName) where T : XContainer
+        {
+            return source.ElementsAnyNS<T>(localName).FirstOrDefault();
+        }
+
+        public static XElement ElementAnyNS<T>(this T source, XName xName) where T : XContainer
+        {
+            return source.ElementAnyNS<T>(xName.LocalName);
+        }
+
+        public static bool EqualsAnyNS(this XName name, string compareName)
+        {
+            if (name == null) return false;
+            if (compareName == null) return false;
+
+            return name.LocalName.Equals(compareName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool EqualsAnyNS(this XName name, XName compareName)
+        {
+            if (name == null) return false;
+            if (compareName == null) return false;
+
+            return name.EqualsAnyNS(compareName.LocalName);
+        }
     }
 }

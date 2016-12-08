@@ -33,5 +33,12 @@ namespace Louw.SitemapParser
             var sitemap = _sitemapParser.Parse(sitemapContent, sitemapLocation);
             return sitemap;
         }
+
+        public async Task<Sitemap> LoadAsync(Sitemap sitemap)
+        {
+            if (sitemap == null)
+                throw new ArgumentNullException("sitemap");
+            return await LoadAsync(sitemap.SitemapLocation);
+        }
     }
 }

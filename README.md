@@ -26,16 +26,27 @@ install-package Louw.SitemapParser
 
 #####Basic Example
 ```cs
-	var loader = new SitemapLoader();
-    Sitemap sitemap = await loader.LoadFromRobotsTxtAsync(new Uri("https://www.google.com"));
-    Assert.Equal(SitemapType.RobotsTxt, sitemap.SitemapType);
-    Assert.NotEmpty(sitemap.Sitemaps); //We expect at least some Sitemaps to be in list
-    Assert.Empty(sitemap.Items); //Robots.txt can only link to Sitemaps  (Not content items)
+	var sitemapLink = new Sitemap(new Uri("https://www.google.com/sitemap.xml"));
+    var loadedSitemap = await sitemapLink.LoadAsync();
 
-    Sitemap firstSitemap = sitemap.Sitemaps.First();
+    if (loadedSitemap.SitemapType == SitemapType.Index)
+        Debug.WriteLine($"Sitemap Index contains {loadedSitemap.Sitemaps.Count()} entries");
+    else if (loadedSitemap.SitemapType == SitemapType.Items)
+        Debug.WriteLine($"Sitemap contains {loadedSitemap.Items.Count()} content locations");
+```
+
+#####Load Sitemaps From Robots.txt Example
+```cs
+	var loader = new SitemapLoader();
+    Sitemap robotSitemap = await loader.LoadFromRobotsTxtAsync(new Uri("https://www.google.com"));
+    Assert.Equal(SitemapType.RobotsTxt, robotSitemap.SitemapType);
+    Assert.NotEmpty(robotSitemap.Sitemaps); //We expect at least some Sitemaps to be in list
+    Assert.Empty(robotSitemap.Items); //Robots.txt can only link to Sitemaps  (Not content items)
+
+    Sitemap firstSitemap = robotSitemap.Sitemaps.First();
     Assert.False(firstSitemap.IsLoaded); //We only have sitemap location. Contents not yet loaded nor parsed
 
-    var firstLoadedSitemap = await loader.LoadAsync(firstSitemap.SitemapLocation);
+    var firstLoadedSitemap = await loader.LoadAsync(firstSitemap);
     Assert.True(firstLoadedSitemap.IsLoaded); //Now items are loaded!
 
     //We have to check type as we can either have links to other sitemaps (i.e. index sitemaps) 

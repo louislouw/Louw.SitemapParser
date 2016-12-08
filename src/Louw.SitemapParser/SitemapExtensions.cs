@@ -17,15 +17,8 @@ namespace Louw.SitemapParser
             if (sitemap.SitemapLocation == null)
                 throw new InvalidOperationException("Sitemap location not specified");
 
-            //Use default implementations
-            if (fetcher == null)
-                fetcher = new WebSitemapFetcher();
-            if (parser == null)
-                parser = new SitemapParser();
-
-            string sitemapContent = await fetcher.Fetch(sitemap.SitemapLocation);
-            var loadedSitemap = parser.Parse(sitemapContent, sitemap.SitemapLocation);
-            return loadedSitemap;
+            var loader = new SitemapLoader(fetcher, parser);
+            return await loader.LoadAsync(sitemap);
         }
     }
 }
