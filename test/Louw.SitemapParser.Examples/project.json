@@ -20,9 +20,5 @@
         "Microsoft.NETCore.Platforms": "1.0.1"
       }
     }
-  },
-
-  "buildOptions": {
-    "copyToOutput": [ "testdata/*.*" ]
   }
 }

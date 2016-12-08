@@ -37,7 +37,7 @@ namespace Louw.SitemapParser
             Items = Enumerable.Empty<SitemapItem>();
 
             if ((sitemapLocation != null) && sitemapLocation.LocalPath.StartsWith("/robots.txt", StringComparison.OrdinalIgnoreCase))
-                SitemapType = SitemapType.Robots;
+                SitemapType = SitemapType.RobotsTxt;
             else
                 SitemapType = SitemapType.Index;
         }

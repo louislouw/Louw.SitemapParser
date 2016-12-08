@@ -17,7 +17,7 @@ namespace Louw.SitemapParser
         /// <summary>
         /// Sitemap was created by parsing of Robots.txt file
         /// </summary>
-        Robots,
+        RobotsTxt,
 
         /// <summary>
         /// Sitemap contains references to other sitemaps

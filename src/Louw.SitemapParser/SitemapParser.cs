@@ -9,7 +9,7 @@ namespace Louw.SitemapParser
 {
     public interface ISitemapParser
     {
-        Sitemap Parse(string sitemapData, Uri sitemapUri = null);
+        Sitemap Parse(string sitemapData, Uri sitemapLocation = null);
     }
 
 
@@ -29,25 +29,25 @@ namespace Louw.SitemapParser
         private readonly XName PriorityName = XName.Get("priority", SitemapSchema);
         #endregion
 
-        public Sitemap Parse(string sitemapData, Uri sitemapUri = null)
+        public Sitemap Parse(string sitemapContent, Uri sitemapLocation = null)
         {
-            if (string.IsNullOrWhiteSpace(sitemapData))
+            if (string.IsNullOrWhiteSpace(sitemapContent))
                 return null;
 
             try
             {
-                XElement sitemapXElement = XElement.Parse(sitemapData);
+                XElement sitemapXElement = XElement.Parse(sitemapContent);
 
                 //Check if this is Index Sitemap
                 if (sitemapXElement.Name.Equals(SitemapIndexName))
                 {
-                    return ParseIndexSitemap(sitemapXElement, sitemapUri);
+                    return ParseIndexSitemap(sitemapXElement, sitemapLocation);
                 }
 
                 //Check if this is Normal Sitemap with items
                 if(sitemapXElement.Name.Equals(UrlSetName))
                 {
-                    return ParseSitemapItems(sitemapXElement, sitemapUri);
+                    return ParseSitemapItems(sitemapXElement, sitemapLocation);
                 }
             }
             catch(Exception ex)
@@ -58,18 +58,18 @@ namespace Louw.SitemapParser
             return null;
         }
 
-        public static Sitemap ParseSitemapFields(Uri baseUri, string location, string lastModified)
+        public static Sitemap ParseSitemapFields(Uri baseUri, string sitemapLocation, string lastModified)
         {
-            if (string.IsNullOrEmpty(location))
+            if (string.IsNullOrEmpty(sitemapLocation))
                 return null;
 
-            Uri parsedLocation = SafeUriParse(baseUri, location);
-            if (parsedLocation == null)
+            Uri parsedSitemapLocation = SafeUriParse(baseUri, sitemapLocation);
+            if (parsedSitemapLocation == null)
                 return null;
 
             DateTime? parsedLastModified = SafeDateTimeParse(lastModified);
 
-            return new Sitemap(parsedLocation, parsedLastModified);
+            return new Sitemap(parsedSitemapLocation, parsedLastModified);
         }
 
         public static SitemapItem ParseSitemapItemFields(Uri baseUri, string location, string lastModified = null, string changeFrequency = null, string priority = null)
