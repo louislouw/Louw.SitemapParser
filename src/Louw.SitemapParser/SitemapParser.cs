@@ -7,12 +7,6 @@ using System.Xml.Linq;
 
 namespace Louw.SitemapParser
 {
-    public interface ISitemapParser
-    {
-        Sitemap Parse(string sitemapData, Uri sitemapLocation = null);
-    }
-
-
     public class SitemapParser : ISitemapParser
     {
         #region Element Names
@@ -52,7 +46,9 @@ namespace Louw.SitemapParser
             }
             catch(Exception ex)
             {
+                //TODO: Handle only expected exceptions here
                 System.Console.WriteLine(ex.Message);
+                throw;
             }
 
             return null;

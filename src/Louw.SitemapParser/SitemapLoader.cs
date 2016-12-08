@@ -20,19 +20,11 @@ namespace Louw.SitemapParser
 
         public async Task<Sitemap> LoadFromRobotsTxtAsync(Uri websiteLocation)
         {
-            try
-            {
-                Uri robotsTxtLocation = new Uri(websiteLocation, "/robots.txt");
-                var robotsTxtContent = await _fetcher.Fetch(robotsTxtLocation);
-                var sitemapLocations = _robotsParser.Parse(robotsTxtContent, robotsTxtLocation);
-                var sitemaps = sitemapLocations.Select(x => new Sitemap(x));
-                return new Sitemap(sitemaps, robotsTxtLocation);
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
+            Uri robotsTxtLocation = new Uri(websiteLocation, "/robots.txt");
+            var robotsTxtContent = await _fetcher.Fetch(robotsTxtLocation);
+            var sitemapLocations = _robotsParser.Parse(robotsTxtContent, robotsTxtLocation);
+            var sitemaps = sitemapLocations.Select(x => new Sitemap(x));
+            return new Sitemap(sitemaps, robotsTxtLocation);
         }
 
         public async Task<Sitemap> LoadAsync(Uri sitemapLocation)
