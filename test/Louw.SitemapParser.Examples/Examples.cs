@@ -14,19 +14,18 @@ namespace Louw.SitemapParser.Examples
             var loader = new SitemapLoader();
             Sitemap sitemap = await loader.LoadFromRobotsTxtAsync(new Uri("https://www.google.com"));
             Assert.Equal(SitemapType.RobotsTxt, sitemap.SitemapType);
-            Assert.Empty(sitemap.Items); //Robots.txt can only link to Sitemaps 
-            Assert.NotEmpty(sitemap.Sitemaps); //We expect at least some sitemaps to be in list
+            Assert.NotEmpty(sitemap.Sitemaps); //We expect at least some Sitemaps to be in list
+            Assert.Empty(sitemap.Items); //Robots.txt can only link to Sitemaps  (Not content items)
 
             Sitemap firstSitemap = sitemap.Sitemaps.First();
-            Assert.False(firstSitemap.IsLoaded); //We only have link, not yet loaded
-            Assert.Empty(sitemap.Items); //Items will still be empty
+            Assert.False(firstSitemap.IsLoaded); //We only have sitemap location. Contents not yet loaded nor parsed
 
             var firstLoadedSitemap = await loader.LoadAsync(firstSitemap.SitemapLocation);
             Assert.True(firstLoadedSitemap.IsLoaded); //Now items are loaded!
 
-            //We have to check type as we can either have links to other sitemaps
-            //or links to actual sitemap items (i.e. links to content)
-            switch(firstLoadedSitemap.SitemapType)
+            //We have to check type as we can either have links to other sitemaps (i.e. index sitemaps) 
+            //-or- links to actual sitemap items (i.e. links to content)
+            switch (firstLoadedSitemap.SitemapType)
             {
                 case SitemapType.Index: Assert.NotEmpty(firstLoadedSitemap.Sitemaps); break;
                 case SitemapType.Items: Assert.NotEmpty(firstLoadedSitemap.Items); break;
