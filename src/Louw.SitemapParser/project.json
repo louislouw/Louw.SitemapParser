@@ -1,19 +1,16 @@
 {
-  "version": "0.0.1-*",
+  "version": "0.0.2-*",
+
   "frameworks": {
-    "netstandard1.6": {
-      "dependencies": {
-        "NETStandard.Library": "1.6.0",
-        "System.Xml.XDocument": "4.3.0"
+    "net452": {
+      "dependencies": {},
+      "frameworkAssemblies": {
+        "System.Net.Http": "4.0.0.0",
+        "System.Xml.Linq": "4.0.0.0"
       }
     },
-    "net452": {
-      "dependencies": {
-        "NETStandard.Library": "1.6.0",
-        "Microsoft.NETCore.Platforms": "1.0.1",
-        "System.Xml.XDocument": "4.0.0",
-        "System.Xml.Linq": "3.5.21022.801"
-      }
+    "netstandard1.6": {
+      "dependencies": { "NETStandard.Library": "1.6.0" }
     }
   },
   "packOptions": {
